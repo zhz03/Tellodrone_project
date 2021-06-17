@@ -1,6 +1,7 @@
 import cv2.cv2 as cv2
 import numpy as np
 
+
 def findFace(img):
     faceCascade = cv2.CascadeClassifier("Resources/haarcascade_frontalface_default.xml")
     imgGray = cv2.cvtColor(img,cv2.COLOR_BGR2BGRA)
@@ -23,6 +24,8 @@ def findFace(img):
     else:
         return img, [[0,0],0]
 
+def trackFace(Drone,info,w,pid,pError):
+    pass
 
 if __name__ == '__main__':
     cap = cv2.VideoCapture(0)
