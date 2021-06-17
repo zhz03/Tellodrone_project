@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     while True:
         img = mytello.get_frame_read().frame
-        img = cv2.resize(img,(360,240))
+        img = cv2.resize(img,(720,480))
         cv2.imshow('image',img)
         values = get_keyboard_input()
         mytello.send_rc_control(values[0],values[1],values[2],values[3])
