@@ -1,6 +1,7 @@
 import cv2.cv2 as cv2
 import numpy as np
 from djitellopy import tello
+import time
 
 width,high = 360,240  # manually set
 fbrange = [6200,6800] # manually set by human
@@ -10,13 +11,13 @@ pError = 0
 def findFace(img):
     faceCascade = cv2.CascadeClassifier("Resources/haarcascade_frontalface_default.xml")
     imgGray = cv2.cvtColor(img,cv2.COLOR_BGR2BGRA)
-    faces = faceCascade.detectMultiScale(imgGray,1.2,10)
+    faces = faceCascade.detectMultiScale(imgGray,1.4,8)
 
     myFaceListC = []
     myFaceListArea =[]
 
     for (x,y,w,h) in faces:
-        cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255),2)
+        cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255),4)
         cx = x+w//2
         cy = y+h//2
         area = w * h
@@ -52,21 +53,27 @@ def trackFace(Drone,info,width,pid,pError):
         error = 0
 
     print("Speed:{},fb:{},".format(speed,fb))
-    #Drone.send_rc_control(0,fb,0,speed)
+    Drone.send_rc_control(0,fb,0,speed)
 
     return error
 
 if __name__ == '__main__':
-    """
+
     mytello = tello.Tello()
     mytello.connect()
     print(mytello.get_battery())
-    """
 
-    mytello = "test"
-    cap = cv2.VideoCapture(0)
+    mytello.streamon()
+    mytello.takeoff()
+    mytello.send_rc_control(0,0,25,0)
+    time.sleep(2.2)
+
+    #mytello = "test"
+    #cap = cv2.VideoCapture(0)
     while True:
-        _,img = cap.read()
+        #_,img = cap.read()
+        img = mytello.get_frame_read().frame
+
         img = cv2.resize(img,(width,high))
         img,info = findFace(img)
         pError = trackFace(mytello,info,width,pid,pError)
@@ -74,7 +81,9 @@ if __name__ == '__main__':
         #print(pError)
         cv2.imshow("ouput",img)
 
-        cv2.waitKey(1)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            mytello.land()
+            break
 
 
 
